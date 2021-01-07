@@ -1,0 +1,3 @@
+mean_test_score,std_test_score,params
+-12288868.471302645,838624.5897724938,"{'doc_topic_prior': 0.772393402455979, 'learning_offset': 43.89834108330891, 'n_components': 15, 'topic_word_prior': 0.3674649966864506}"
+-12349318.144545827,837992.7117427071,"{'doc_topic_prior': 0.24210823184129304, 'learning_offset': 20.32172534056673, 'n_components': 10, 'topic_word_prior': 0.33782122069279574}"
