@@ -11,17 +11,24 @@ import spacy
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from gensim.test.utils import common_texts
+from gensim.corpora.dictionary import Dictionary
+import gensim
+from nltk.tokenize import word_tokenize
 
 nltk.download('stopwords')
 nltk.download('punkt')
 stopwords_ = set(stopwords.words('english'))
 additional_stopwords = ('congress', 'act', 'states', 'united', 
-                        'house', '116th', 'html', 'pre', 'body', 'doc',
-                        'session', 'bill', 'introduced', 
+                        'house', '116th', 'hundred', 'sixteenth', 'html', 'pre', 'body', 'doc',
+                        'session', 'bill', 'introduced', 'two', 'thousand', 'twenty', 
                         'title','gt', 'subsection', 'paragraph', 'subparagraph',
-                        'insert', 'section', 'mr', 'ms', 'mrs', 'shall', 'sec',
-                        'lt', 'th', 'st', 'a', 'b', 'c', 'd' , 'e', 'f', 'g' , 'h' ,'res' ,'j')
-roman_numerals = ('i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii', 'xiii', 'xiv')
+                        'insert', 'section', 'mr', 'ms', 'mrs', 'shall', 'sec', 'law', 'year', 'secretary',
+                        'semicolon', 'comma', 'include', 'dz', 'af', 'etc', 'llc',
+                        'lt', 'th', 'st', 'a', 'b', 'c', 'd' , 'e', 'f', 'g' , 'h' ,'res' ,'j', 'r',
+                        'aa', 'bb', 'cc', 'de', 'dt', 'dz', 'ee', 'ff','gg','hh','kk','mm','nn','oo','ss','ww')
+roman_numerals = ('i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi',
+                  'xii', 'xiii', 'xiv', 'xix', 'xv', 'xvi', 'xvii', 'xx', 'xxi', 'xxii', 'xviii','xxiii','xxvii')
 stopwords_ = stopwords_.union(additional_stopwords)
 stopwords_ = stopwords_.union(roman_numerals)
 
@@ -58,6 +65,13 @@ def lemmatize(text):
         sent.append(word.lemma_)
     return " ".join(sent)
 
+#Bigram function 
+def sent_to_words(sentences):
+        for sentence in sentences:
+            yield(gensim.utils.simple_preprocess(str(sentence), deacc=True)) 
+def make_bigrams(texts):
+    return [bigram_mod[doc] for doc in texts]
+
 version_def = {
  'ih': 'Introduced in House',
  'is': 'Introduced in Senate',
@@ -88,7 +102,7 @@ ordered_versions.remove('eah')
 ordered_versions.remove('eas')
 
 bill_type = ['s', 'sjres', 'hr', 'hjres']
-congress = [116, 115]
+congress = [116]
 
 for c in congress:
     all_folders = []
@@ -155,6 +169,14 @@ for c in congress:
             print(f"{latest_version_zipped[i]} failed to process because {repr(e)}")
 
     bill_text_df = pd.DataFrame(all_bills)
+
+    #Bigrams 
+    data_words = list(sent_to_words(bill_text_df['text']))
+    bigram = gensim.models.Phrases(data_words, min_count=5, threshold=400) # higher threshold fewer phrases. 
+    bigram_mod = gensim.models.phrases.Phraser(bigram)
+    data_words_bigrams = make_bigrams(data_words)
+
+    bill_text_df['text_bigrams'] = [' '.join(w) for w in data_words_bigrams]
     bill_text_df['congress'] = c
 
     csv_name = str(c) + 'bill_text.csv'
