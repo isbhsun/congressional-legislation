@@ -11,8 +11,7 @@ from gensim.corpora.dictionary import Dictionary
 import gensim
 from nltk.tokenize import word_tokenize
 
-nltk.download('stopwords')
-nltk.download('punkt')
+
 stopwords_ = set(stopwords.words('english'))
 additional_stopwords = ('congress', 'act', 'states', 'united', 
                         'house', '116th', 'hundred', 'sixteenth', 'html', 'pre', 'body', 'doc',

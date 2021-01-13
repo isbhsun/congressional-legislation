@@ -12,6 +12,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 # Additional information about the bill
+bill_type = ['s', 'sjres', 'hr', 'hjres']
+
 bill_info_folders = []
 for folder in bill_type:
     rootdir = 'data/116/bills/'+folder
